@@ -1,5 +1,5 @@
 
-[README.md](https://github.com/user-attachments/files/34442102/README.md)
+
 <p align="center">
   <img src="app.png" width="112" alt="HO Studio">
 </p>
@@ -7,7 +7,7 @@
 <h1 align="center">HO Studio</h1>
 
 <p align="center">
-  Редактор и рендерер текстово<p align="center">
+  Редактор и рендерер текстов<p align="center">
   <img src="app.png" width="112" alt="HO Studio">
 </p>
 
