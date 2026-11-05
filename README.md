@@ -1,0 +1,190 @@
+[README.md](https://github.com/user-attachments/files/34442102/README.md)
+<p align="center">
+  <img src="app.png" width="112" alt="HO Studio">
+</p>
+
+<h1 align="center">HO Studio</h1>
+
+<p align="center">
+  Редактор и рендерер текстового формата изображений <code>.ho</code><br>
+  Python + Tkinter + Pillow, без тяжёлых зависимостей
+</p>
+
+---
+
+**HO Studio** рисует картинки по текстовым командам. Файл `.ho` — обычный текст: в нём написано, какого размера холст, что на нём нарисовать и каким цветом. Программа читает команды, показывает предпросмотр и сохраняет результат в PNG.
+
+Никаких внешних изображений, никакого бинарного формата — только текст и математика.
+
+## Возможности
+
+- Редактор кода слева, живой предпросмотр справа.
+- Сглаживание: холст рисуется в 3 раза больше и уменьшается фильтром LANCZOS — линии и текст без «лесенки».
+- Каждая команда рисуется на отдельном слое, поэтому тени, свечение, прозрачность и поворот работают корректно.
+- Градиенты: линейные (2–3 цвета, по вертикали и горизонтали) и радиальные, в том числе для текста.
+- Тени и свечение повторяют реальную форму фигуры.
+- 12 фигур: прямоугольник, круг, эллипс, скруглённый прямоугольник, треугольник, многоугольник, звезда, линия, дуга, сектор, кривые Безье, текст.
+- Ошибки не роняют программу: проблемная строка пропускается, сообщение с номером строки попадает в нижнюю панель.
+- Проверка обновлений в фоновом потоке, со ссылкой на скачивание.
+- Сборка в один `.exe` через PyInstaller.
+
+## Пример
+
+```ho
+format 16:9
+bg grad(#0b1a24, #123a4a, #1d5d63, v)
+
+var accent #ffcc66
+
+text 960 470 "HO STUDIO" size=132 color=#ffffff bold=true anchor=mm stroke=5 stroke_color=#0b1a24
+text 960 590 "рисунок из обычного текста" size=34 color=#bfe9f2 anchor=mm
+text 60 52 "F5 — обновить предпросмотр" size=30 color=#8fd6e6 anchor=lt
+text 1860 1028 "экспорт: PNG" size=30 color=#8fd6e6 anchor=rb
+
+circle 1610 300 150 fill=none outline=$accent width=8 glow=true glow_color=$accent glow_blur=34
+star 1610 300 74 168 5 fill=$accent
+
+rect 120 760 520 200 radius=28 fill=#ffffff opacity=0.10 outline=#ffffff width=2
+text 172 860 "hello, .ho" size=54 color=#ffffff bold=true anchor=lm
+```
+
+Результат — файл `preview.png` в этом репозитории.
+
+![Пример рендера](preview.png)
+
+## Установка и запуск
+
+Нужен Python 3.9 или новее.
+
+```bash
+pip install pillow
+python ho_studio.py
+```
+
+Проверить рендер без интерфейса:
+
+```python
+import ho_studio
+image, errors = ho_studio.render_code(open("image.ho", encoding="utf-8").read())
+image.save("out.png")
+print(errors)
+```
+
+## Горячие клавиши
+
+| Клавиши | Действие |
+|---|---|
+| `F5` | обновить предпросмотр |
+| `Ctrl+O` | открыть `.ho` |
+| `Ctrl+S` | сохранить `.ho` |
+| `Ctrl+E` | экспорт в PNG |
+| `F1` | инструкция по формату |
+
+Полная инструкция по всем командам встроена в программу: меню **Справка → Инструкция по формату**.
+
+## Формат `.ho`
+
+Одна строка — одна команда. Строки, начинающиеся с `#`, и пустые строки игнорируются. Координаты в пикселях от левого верхнего угла.
+
+### Холст
+
+| Команда | Описание |
+|---|---|
+| `format 16:9` | пресеты: `16:9` (1920×1080), `9:16` (1080×1920), `1:1` (1080×1080), `4:3` (1440×1080) |
+| `size 1280 720` | произвольный размер, от 16 до 8000 px по стороне |
+| `bg #101820` | цвет фона: HEX или имя |
+| `bg grad(#0f2027, #2c5364, v)` | градиентный фон, `v` — сверху вниз, `h` — слева направо |
+| `bg_image "bg.jpg" fit=cover` | картинка на фон: `cover`, `contain`, `stretch` |
+
+### Переменные
+
+```ho
+var accent #ffcc66
+rect 40 40 200 120 fill=$accent
+```
+
+Переменная подставляется в любой токен ниже места объявления.
+
+### Фигуры
+
+| Команда | Аргументы |
+|---|---|
+| `rect` | `X Y ШИРИНА ВЫСОТА` |
+| `circle` | `X Y РАДИУС` (X Y — центр) |
+| `ellipse` | `X Y ШИРИНА ВЫСОТА` |
+| `roundrect` | `X Y ШИРИНА ВЫСОТА РАДИУС` |
+| `triangle` | `X1 Y1 X2 Y2 X3 Y3` |
+| `polygon` | `X1 Y1 X2 Y2 ...` |
+| `star` | `X Y ВНУТР_РАДИУС ВНЕШН_РАДИУС ЛУЧЕЙ` |
+| `line` | `X1 Y1 X2 Y2` |
+| `arc` | `X Y РАДИУС НАЧАЛО КОНЕЦ` |
+| `pie` | `X Y РАДИУС НАЧАЛО КОНЕЦ` |
+| `path` | `"M x y L x y C x1 y1 x2 y2 x3 y3"` |
+| `text` | `X Y "ТЕКСТ"` |
+
+### Стили
+
+Пишутся в конце команды через пробел:
+
+`fill=` `outline=` `width=` `opacity=` `radius=` `rotate=` `dash=` `noise=` `blend=` `shadow=true` `shadow_color=` `shadow_blur=` `shadow_dx=` `shadow_dy=` `glow=true` `glow_color=` `glow_blur=`
+
+Для текста дополнительно: `size=` `color=` `bold=` `italic=` `stroke=` `stroke_color=` `wrap=` `anchor=`.
+
+`anchor` — две буквы: `l/m/r` + `t/m/b`. `mm` — координаты это центр текста, `lt` — левый верхний угол, `rb` — правый нижний.
+
+### Градиенты
+
+```ho
+fill=grad(#ff0000, #0000ff, v)          # два цвета
+fill=grad(#ff0000, #00ff00, #0000ff, h) # три цвета
+fill=grad_radial(#ffffff, #003366)      # радиальный
+color=grad(#ffcc00, #ff0066, h)         # градиентный текст
+```
+
+## Сборка в `.exe`
+
+```bash
+pip install pyinstaller
+pyinstaller --onefile --windowed --name HO-Studio --icon app.ico --add-data "app.ico;." ho_studio.py
+```
+
+Готовый файл — `dist\HO-Studio.exe`. `--icon` задаёт иконку самого файла, `--add-data` кладёт иконку внутрь сборки, откуда её берёт окно программы.
+
+Через графическую оболочку **auto-py-to-exe**: Script → `ho_studio.py`, One File, Windowed, Icon → `app.ico`, Additional Files → `app.ico` с Destination `.`.
+
+## Автообновление
+
+В коде две константы:
+
+```python
+APP_VERSION = "1.0"
+UPDATE_URL = "https://raw.githubusercontent.com/MotarolaDev/ho-studio/main/version.json"
+```
+
+`version.json` в репозитории:
+
+```json
+{
+  "version": "1.1",
+  "notes": "добавлены arc, pie и path",
+  "url": "https://github.com/MotarolaDev/ho-studio/releases/download/v1.1/HO-Studio.exe"
+}
+```
+
+Порядок выпуска: поднять `APP_VERSION` → собрать exe → опубликовать релиз с тегом `vX.Y` → обновить `version.json`. Уведомление появляется, только если версия на сервере строго больше `APP_VERSION`; ссылка в окне открывается в браузере.
+
+## Структура проекта
+
+| Файл | Назначение |
+|---|---|
+| `ho_studio.py` | всё приложение: парсер, движок рендера, интерфейс |
+| `make_icon.py` | генератор иконки, создаёт `app.png` и `app.ico` |
+| `app.ico` | иконка в 7 размерах (16–256 px) |
+| `app.png` | логотип 512×512 |
+| `preview.png` | пример рендера из README |
+| `version.json` | файл для проверки обновлений |
+
+## Лицензия
+
+Лицензия пока не выбрана. Если планируете открывать код для внешних участников, добавьте файл `LICENSE` — например, MIT.
+
