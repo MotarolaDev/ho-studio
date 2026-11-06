@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/34485952/README.md)
+
 <p align="center">
   <img src="app.png" width="96" alt="HO Studio">
 </p>
