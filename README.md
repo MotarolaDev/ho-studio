@@ -51,26 +51,6 @@ text 172 860 "hello, .ho" size=54 color=#ffffff bold=true anchor=lm
 | `Ctrl+E` | экспорт в PNG |
 | `F1` | инструкция по формату |
 
-## Сборка
-
-Запуск из исходников:
-
-```bash
-pip install pillow
-python ho_studio.py
-```
-
-Один exe-файл:
-
-```bash
-pip install pyinstaller
-pyinstaller --onefile --windowed --name HO-Studio --icon app.ico --add-data "app.ico;." ho_studio.py
-```
-
-Результат — `dist\HO-Studio.exe`. Флаг `--icon` задаёт иконку файла, `--add-data` кладёт `app.ico` внутрь сборки, откуда её берёт окно программы.
-
-Через auto-py-to-exe: Script `ho_studio.py`, One File, Windowed, Icon `app.ico`, Additional Files `app.ico` с Destination `.`.
-
 ## Важно знать
 
 - Windows 10/11, 64 бита.
