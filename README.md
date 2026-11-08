@@ -44,7 +44,7 @@ text 172 860 "hello, .ho" size=54 color=#ffffff bold=true anchor=lm
 
 ## Как скачать
 
-1. Открыть [Releases](../../releases/latest).
+1. Открыть [Releases](https://github.com/MotarolaDev/ho-studio/releases/latest).
 2. Скачать `HO-Studio.exe`.
 3. Запустить двойным щелчком.
 
